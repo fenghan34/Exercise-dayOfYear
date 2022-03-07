@@ -1,0 +1,13 @@
+{
+  "name": "exercise-fenghan",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "test": "ts-node day-of-year.spec.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  }
+}
