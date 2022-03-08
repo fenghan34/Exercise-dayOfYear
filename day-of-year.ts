@@ -1,53 +1,10 @@
-type NumberRange<
-  Max extends number,
-  T extends number[] = []
-> = T['length'] extends Max
-  ? T[number]
-  : NumberRange<
-      Max,
-      [[...T, any] extends [...infer Compo] ? Compo['length'] : never, ...T]
-    >
-
-type Tuple<T extends number, U extends any[] = []> = U['length'] extends T
-  ? U
-  : Tuple<T, [...U, any]>
-
-type LessThan<A extends number, B extends number> = Tuple<A> extends [
-  ...[Tuple<B>, any],
-  ...any
-]
-  ? false
-  : true
-
-type IsSafe<T extends number> = LessThan<T, 997> extends true ? false : true
-type IsLeapYear<Year extends number> = Year extends 0
-  ? true
-  : LessThan<Year, 4> extends true
-  ? false
-  : Tuple<Year> extends [...Tuple<4>, ...infer Rest]
-  ? IsLeapYear<Rest['length']>
-  : false
-
-type MonthRange = NumberRange<12>
-
-type February = 2
-type LunarMonths = 4 | 9 | 11
-type MonthDaysRange<
-  Month extends number,
-  Year extends number = any
-> = Month extends February
-  ? NumberRange<IsLeapYear<Year> extends true ? 29 : 28>
-  : MonthRange extends LunarMonths
-  ? NumberRange<30>
-  : NumberRange<31>
-
 /**
- *  Compute the day of the year for that date.
- *  计算给定日期是当年的第几天
- *  @param year
- *  @param month
- *  @param day
- *  @returns the day. 天数
+ * Compute the day of the year for that date.
+ *
+ * @param year - Year
+ * @param month - Month
+ * @param day - Day
+ * @returns The day of the year for specific date.
  */
 export const dayOfYear = (function () {
   const cache = new Map<string, number>()
@@ -55,16 +12,29 @@ export const dayOfYear = (function () {
   return function dayOfYearInner<Year extends number, Month extends MonthRange>(
     year: Year,
     month: Month,
-    day: MonthDaysRange<Month, Year>
+    day: DaysRange<Month>
   ): number {
+    const errorMessage = 'Invalid date'
+    const params = [year, month, day]
+
+    // check param types
+    params.forEach(() => assert(isPositiveInteger(year), errorMessage))
+
+    // check month
+    assert(month <= 12, errorMessage)
+
     const cacheKey = `${year},${month},${day}`
 
     if (cache.has(cacheKey)) {
+      // if we found cached result
       return cache.get(cacheKey)
     }
 
     const isLeapYear = year % 4 === 0
     const monthDaysMap = getMonthDaysMapByYearType(isLeapYear)
+
+    // check day
+    assert(day <= monthDaysMap.get(month), errorMessage)
 
     const result =
       Array.from({ length: month - 1 }, (_, i) => i + 1).reduce(
@@ -72,6 +42,7 @@ export const dayOfYear = (function () {
         0
       ) + day
 
+    // save result to cache map
     cache.set(cacheKey, result)
 
     return result
@@ -79,24 +50,40 @@ export const dayOfYear = (function () {
 })()
 
 /**
- * Get the months map of specific year type
- * @param {boolean} isLeapYear if it is leap year
- * @returns
+ * Get the number of days in each month according to whether it is a leap year.
+ *
+ * @param isLeapYear - If it is leap year
+ * @returns The number of days in each month
  */
-const getMonthDaysMapByYearType = (function () {
-  const monthDaysMap = Array.from({ length: 11 }, (_, i) => i + 1).reduce(
-    (map, month) => {
-      const lunarMonths = [4, 9, 11]
-      const totalDays = month === 2 ? 28 : lunarMonths.includes(month) ? 30 : 31
-      return map.set(month, totalDays)
-    },
-    new Map<number, number>()
-  )
+export const getMonthDaysMapByYearType = (function () {
+  let monthDaysMap: Map<number, number>
+
+  const LUNAR_MONTHS = [4, 6, 9, 11]
+  const FEBRUARY = 2
 
   return function (isLeapYear: boolean): Map<number, number> {
-    monthDaysMap.set(2, isLeapYear ? 29 : 28)
+    if (!monthDaysMap) {
+      // initialize map lazily
+
+      const totalMonths = Array.from({ length: 12 }, (_, i) => i + 1)
+
+      monthDaysMap = totalMonths.reduce((map, month) => {
+        return map.set(month, LUNAR_MONTHS.includes(month) ? 30 : 31)
+      }, new Map())
+    }
+
+    monthDaysMap.set(FEBRUARY, isLeapYear ? 29 : 28)
+
     return monthDaysMap
   }
 })()
 
-dayOfYear(800, 2, 29)
+export function isPositiveInteger(value: number) {
+  return Number.isInteger(value) && value > 0
+}
+
+export function assert(condition: unknown, msg: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
+}

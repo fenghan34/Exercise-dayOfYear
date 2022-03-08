@@ -3,5 +3,6 @@
     "lib": ["ESNext"],
     "esModuleInterop": true,
     "moduleResolution": "node"
-  }
+  },
+  "exclude": []
 }
