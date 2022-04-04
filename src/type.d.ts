@@ -5,13 +5,13 @@
  */
 type NumberRange<
   Max extends number,
-  T extends number[] = []
+  T extends number[] = [],
 > = T['length'] extends Max
   ? T[number]
   : NumberRange<
-      Max,
-      [[...T, any] extends [...infer Compo] ? Compo['length'] : never, ...T]
-    >
+  Max,
+  [[...T, any]['length'], ...T]
+  >
 
 /**
  * Month range.
@@ -29,8 +29,8 @@ type LunarMonths = 4 | 6 | 9 | 11
 type DaysRange<Month extends number> = Month extends February
   ? NumberRange<29>
   : Month extends LunarMonths
-  ? NumberRange<30>
-  : NumberRange<31>
+    ? NumberRange<30>
+    : NumberRange<31>
 
 /**
  * Generate a tuple of the given length.
@@ -52,7 +52,7 @@ type Tuple<T extends number, U extends any[] = []> = U['length'] extends T
 type IsLeapYear<Year extends number> = Year extends 0
   ? true
   : Year extends 1 | 2 | 3
-  ? false
-  : Tuple<Year> extends [...Tuple<4>, ...infer Rest]
-  ? IsLeapYear<Rest['length']>
-  : false
+    ? false
+    : Tuple<Year> extends [...Tuple<4>, ...infer Rest]
+      ? IsLeapYear<Rest['length']>
+      : false

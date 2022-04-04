@@ -1,53 +1,4 @@
-/**
- * Compute the day of the year for that date.
- *
- * @param year - Year
- * @param month - Month
- * @param day - Day
- * @returns The day of the year for specific date.
- */
-export const dayOfYear = (function () {
-  const cache = new Map<string, number>()
-
-  return function dayOfYearInner<Year extends number, Month extends MonthRange>(
-    year: Year,
-    month: Month,
-    day: DaysRange<Month>
-  ): number {
-    const errorMessage = 'Invalid date'
-    const params = [year, month, day]
-
-    // check param types
-    params.forEach(() => assert(isPositiveInteger(year), errorMessage))
-
-    // check month
-    assert(month <= 12, errorMessage)
-
-    const cacheKey = `${year},${month},${day}`
-
-    if (cache.has(cacheKey)) {
-      // if we found cached result
-      return cache.get(cacheKey)
-    }
-
-    const isLeapYear = year % 4 === 0
-    const monthDaysMap = getMonthDaysMapByYearType(isLeapYear)
-
-    // check day
-    assert(day <= monthDaysMap.get(month), errorMessage)
-
-    const result =
-      Array.from({ length: month - 1 }, (_, i) => i + 1).reduce(
-        (sum, month) => (sum += monthDaysMap.get(month)),
-        0
-      ) + day
-
-    // save result to cache map
-    cache.set(cacheKey, result)
-
-    return result
-  }
-})()
+import { assert, isPositiveInteger } from './utils'
 
 /**
  * Get the number of days in each month according to whether it is a leap year.
@@ -78,12 +29,53 @@ export const getMonthDaysMapByYearType = (function () {
   }
 })()
 
-export function isPositiveInteger(value: number) {
-  return Number.isInteger(value) && value > 0
-}
+/**
+ * Compute the day of the year for that date.
+ *
+ * @param year - Year
+ * @param month - Month
+ * @param day - Day
+ * @returns The day of the year for specific date.
+ */
+export const dayOfYear = (function () {
+  const cache = new Map<string, number>()
 
-export function assert(condition: unknown, msg: string): asserts condition {
-  if (!condition) {
-    throw new Error(msg)
+  return function dayOfYearInner<Year extends number, Month extends MonthRange>(
+    year: Year,
+    month: Month,
+    day: DaysRange<Month>,
+  ): number {
+    const errorMessage = 'Invalid date'
+    const params = [year, month, day]
+
+    // check param types
+    params.forEach(() => assert(isPositiveInteger(year), errorMessage))
+
+    // check month
+    assert(month <= 12, errorMessage)
+
+    const cacheKey = `${year},${month},${day}`
+
+    if (cache.has(cacheKey)) {
+      // if we found cached result
+      return cache.get(cacheKey)
+    }
+
+    const isLeapYear = year % 4 === 0
+    const monthDaysMap = getMonthDaysMapByYearType(isLeapYear)
+
+    // check day
+    assert(day <= monthDaysMap.get(month), errorMessage)
+
+    const result
+      = Array.from({ length: month - 1 }, (_, i) => i + 1).reduce(
+        (sum, month) => (sum += monthDaysMap.get(month)),
+        0,
+      ) + day
+
+    // save result to cache map
+    cache.set(cacheKey, result)
+
+    return result
   }
-}
+})()

@@ -6,7 +6,7 @@
 
 ---
 
-**You can review the main function [here](https://github.com/fenghan34/Exercise-dayOfYear/blob/345f2b7ece97ba30c64793a202da276c79403f8e/day-of-year.ts#L1-L50).**
+**You can review the main function [here](https://github.com/fenghan34/Exercise-dayOfYear/blob/ba10efeafaf90a6687b7c4ddd4c197ab571fd1f7/src/day-of-year.ts#L32-L81).**
 
 **You can also follow commands below to run test:**
 

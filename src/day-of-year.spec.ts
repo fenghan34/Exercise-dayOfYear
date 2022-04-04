@@ -1,30 +1,26 @@
-import {
-  assert,
-  dayOfYear,
-  getMonthDaysMapByYearType,
-  isPositiveInteger,
-} from './day-of-year'
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { dayOfYear, getMonthDaysMapByYearType } from './day-of-year'
 
 describe('Compute the day of the year for that date.', () => {
   describe('dayOfYear()', () => {
     it('should throw error with message', () => {
       const msg = 'Invalid date'
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => dayOfYear('2022', '3', '1')).toThrowError(msg)
 
       expect(() => dayOfYear(0, 1, 31)).toThrowError(msg)
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => dayOfYear(2022, -1, 31)).toThrowError(msg)
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => dayOfYear(2022, 13, 31)).toThrowError(msg)
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => dayOfYear(0, 13, 31)).toThrowError(msg)
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => dayOfYear(2022, 4, 31)).toThrowError(msg)
 
       expect(() => dayOfYear(2022, 2, 29)).toThrowError(msg)
@@ -64,41 +60,6 @@ describe('Compute the day of the year for that date.', () => {
 
       days[1] = 29
       expect(genValuesArray(getMonthDaysMapByYearType(true))).toEqual(days)
-    })
-  })
-
-  describe('isPositiveInteger()', () => {
-    it('should return false', () => {
-      expect(isPositiveInteger(0)).toBe(false)
-
-      expect(isPositiveInteger(-1)).toBe(false)
-
-      // @ts-ignore
-      expect(isPositiveInteger('11')).toBe(false)
-    })
-
-    it('should return true', () => {
-      expect(isPositiveInteger(1)).toBe(true)
-
-      expect(isPositiveInteger(100)).toBe(true)
-    })
-  })
-
-  describe('assert()', () => {
-    it('should throw error', () => {
-      expect(() => assert(0, 'invalid')).toThrowError('invalid')
-
-      expect(() => assert(undefined, '')).toThrowError('')
-
-      expect(() => assert(false, '')).toThrowError('')
-
-      expect(() => assert(1 > 2, '')).toThrowError('')
-    })
-
-    it('should not throw error', () => {
-      expect(assert(true, 'invalid')).toBeUndefined()
-
-      expect(assert(2 > 1, '')).toBeUndefined()
     })
   })
 })
